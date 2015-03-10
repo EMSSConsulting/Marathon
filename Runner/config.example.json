@@ -1,0 +1,7 @@
+﻿{
+	"url": "https://ci.gitlab.org",
+	"token": "",
+	"builds_path": "C:\\Builds\\",
+	"shell": "powershell",
+	"setup": "git config http.sslVerify false"
+}
