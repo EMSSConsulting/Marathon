@@ -62,10 +62,10 @@ namespace Marathon
                     Log.Info("Build #{0} completed", buildInfo.ID);
                 else
                     Log.Warn("Build #{0} failed", buildInfo.ID);
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-#pragma warning disable CS4014
                 Task.Run(async () =>
-#pragma warning restore CS4014
+#pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 {
                     var updateResponse = NetworkResponse.Failure;
                     while (updateResponse == NetworkResponse.Failure)

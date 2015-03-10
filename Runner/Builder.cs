@@ -57,10 +57,10 @@ namespace Marathon
             var process = Runner.Shell.PrepareBuild(CommandFile, ProjectDirectory, BuildInfo);
             Log.Trace("Running build #{0} process", BuildInfo.ID);
             var output = Runner.Shell.StartProcess(process);
+#pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-#pragma warning disable CS4014
             Task.Run(async () =>
-#pragma warning restore CS4014
+#pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             {
                 while (!process.HasExited)
                 {
