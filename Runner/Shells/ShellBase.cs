@@ -10,7 +10,12 @@ namespace Marathon.Shells
 {
     public abstract class ShellBase
     {
-        protected static List<ShellBase> RegisteredShells { get; private set; } = new List<ShellBase>();
+        static ShellBase()
+        {
+            RegisteredShells = new List<ShellBase>();
+        }
+
+        protected static List<ShellBase> RegisteredShells { get; private set; }
 
         public static void Register(params ShellBase[] shells)
         {

@@ -31,12 +31,12 @@ namespace Marathon
 
         protected string ProjectDirectory
         {
-            get { return Path.Combine(BuildsDirectory, $"project-{BuildInfo.ProjectID}"); }
+            get { return Path.Combine(BuildsDirectory, "project-" + BuildInfo.ProjectID); }
         }
 
         protected string CommandFile
         {
-            get { return Path.GetFullPath(Path.Combine("tmp", "scripts", $"gitlabci-project-{BuildInfo.ProjectID}{Runner.Shell.FileExtension}")); }
+            get { return Path.GetFullPath(Path.Combine(BuildsDirectory, "scripts", "project-" + BuildInfo.ProjectID + Runner.Shell.FileExtension)); }
         }
 
         protected bool RepositoryExists
@@ -74,7 +74,7 @@ namespace Marathon
             var result = await Runner.Shell.WaitForExit(process, BuildInfo.Timeout, () =>
             {
                 process.Kill();
-                output.AppendLine($"{Environment.NewLine}CI Timeout. Execution tool longer than {BuildInfo.Timeout} seconds.");
+                output.AppendFormat("{0}CI Timeout. Execution tool longer than {1} seconds.{0}", Environment.NewLine, BuildInfo.Timeout);
             });
 
             Log.Trace("Build #{0} execution completed", BuildInfo.ID);
@@ -103,21 +103,21 @@ namespace Marathon
             var commands = new List<string>();
             if (BuildInfo.AllowGitFetch && RepositoryExists)
             {
-                commands.Add($"cd \"{ProjectDirectory}\"");
-                commands.Add($"git reset --hard");
-                commands.Add($"git clean -fdx");
-                commands.Add($"git remote set-url origin {BuildInfo.RepoURL}");
-                commands.Add($"git fetch origin");
+                commands.Add(string.Format("cd \"{0}\"", ProjectDirectory));
+                commands.Add("git reset --hard");
+                commands.Add("git clean -fdx");
+                commands.Add(string.Format("git remote set-url origin {0}", BuildInfo.RepoURL));
+                commands.Add("git fetch origin");
             }
             else
             {
-                commands.Add($"cd \"{BuildsDirectory}\"");
-                commands.Add($"git clone {BuildInfo.RepoURL} project-{BuildInfo.ProjectID}");
+                commands.Add(string.Format("cd \"{0}\"", BuildsDirectory));
+                commands.Add(string.Format("git clone {0} project-{1}", BuildInfo.RepoURL, BuildInfo.ProjectID));
             }
 
-            commands.Add($"cd \"{ProjectDirectory}\"");
-            commands.Add($"git reset --hard");
-            commands.Add($"git checkout {BuildInfo.SHA}");
+            commands.Add(string.Format("cd \"{0}\"", ProjectDirectory));
+            commands.Add("git reset --hard");
+            commands.Add("git checkout " + BuildInfo.SHA);
 
             commands.AddRange(BuildInfo.Commands.Split('\n').Select(x => x.Trim()));
 

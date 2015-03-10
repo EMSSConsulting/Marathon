@@ -18,7 +18,7 @@ namespace Marathon.Shells
 
         protected override ProcessStartInfo PrepareProcess(string commandFile)
         {
-            var startInfo = new ProcessStartInfo("powershell.exe", $"-NoProfile -ExecutionPolicy Bypass -Command \"{commandFile}\"");
+            var startInfo = new ProcessStartInfo("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -Command \"" + commandFile + "\"");
 
             return startInfo;
         }
@@ -26,9 +26,9 @@ namespace Marathon.Shells
         public override string PrepareCommands(IEnumerable<string> commands)
         {
             return commands.Select(x => x.Trim()).Where(x => x.Length > 0)
-                .Select(x => $"Write \"{x.Replace("\"", "\"\"")}\"{Environment.NewLine}{x}")
+                .Select(x => string.Format("Write {1}{0}{1}", Environment.NewLine, x.Replace("\"", "\"\"")))
                 //.Select(x => $"{x}{Environment.NewLine}if(-not $?) {{ Exit $LastExitCode }}")
-                .Aggregate((left, right) => $"{left}{Environment.NewLine}{right}{Environment.NewLine}");
+                .Aggregate((left, right) => string.Format("{1}{0}{2}{0}", Environment.NewLine, left, right));
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Marathon
 
         public RestClient Client { get; private set; }
 
-        public bool Running { get; protected set; } = true;
+        public bool Running { get; protected set; }
 
         #region Helper Classes
 
@@ -51,17 +51,17 @@ namespace Marathon
                 var buildInfo = await Network.RequestBuild();
                 if (buildInfo == null) continue;
 
-                Log.Info($"Starting build #{buildInfo.ID} for {buildInfo.ProjectName}");
-                Log.Debug($"{buildInfo.BeforeSHA}...{buildInfo.SHA}");
+                Log.Info("Starting build #{0} for {1}", buildInfo.ID, buildInfo.ProjectName);
+                Log.Debug("{0}...{1}", buildInfo.BeforeSHA, buildInfo.SHA);
 
                 var build = new Build(this, buildInfo);
 
                 var result = await build.PerformBuild();
 
                 if (result.Success)
-                    Log.Info($"Build #{buildInfo.ID} completed");
+                    Log.Info("Build #{0} completed", buildInfo.ID);
                 else
-                    Log.Warn($"Build #{buildInfo.ID} failed");
+                    Log.Warn("Build #{0} failed", buildInfo.ID);
 
 #pragma warning disable CS4014
                 Task.Run(async () =>
@@ -110,7 +110,7 @@ namespace Marathon
                     token = Console.ReadLine();
                 }
 
-                Console.WriteLine($"Registering runner as {description} with registration token {token} on {url}.");
+                Console.WriteLine("Registering runner as {0} with registration token {1} on {2}.", description, token, url);
                 var runner = await Network.RegisterRunner(token, description, tagList.Split(','));
                 if (runner != null)
                 {
@@ -130,13 +130,15 @@ namespace Marathon
             Log.Debug("Using shell environment: {0}", Configuration.Get("shell") ?? "cmd");
             Shell = Shells.ShellBase.GetShell(Configuration.Get("shell") ?? "cmd");
 
+            Network = new Network(this);
+
             if (!string.IsNullOrEmpty(Configuration.Get<string>("url")))
             {
                 Log.Debug("Using coordinator: {0}", Configuration.Get<string>("url"));
                 Client = new RestClient(Configuration.Get<string>("url"));
-            }
 
-            Network = new Network(this);
+                Running = true;
+            }
         }
     }
 }
