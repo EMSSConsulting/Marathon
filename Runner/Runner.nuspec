@@ -1,16 +1,20 @@
 <?xml version="1.0"?>
 <package >
-  <metadata>
-    <id>Marathon</id>
-    <version>$version$</version>
-    <title>Marathon</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
-    <projectUrl>https://github.com/emssconsulting/marathon</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <releaseNotes>Initial release of Marathon</releaseNotes>
-    <copyright>Copyright EMSS Consulting Pty (Ltd) 2015</copyright>
-    <tags>GitLab Runner</tags>
-  </metadata>
+    <metadata>
+        <id>Marathon</id>
+        <version>$version$</version>
+        <title>Marathon</title>
+        <authors>$author$</authors>
+        <owners>$author$</owners>
+        <projectUrl>https://github.com/emssconsulting/marathon</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>$description$</description>
+        <releaseNotes>Initial release of Marathon</releaseNotes>
+        <copyright>Copyright EMSS Consulting Pty (Ltd) 2015</copyright>
+        <tags>GitLab Runner</tags>
+    </metadata>
+
+    <files>
+        <file src="config.example.json" target="content" />
+    </files>
 </package>
