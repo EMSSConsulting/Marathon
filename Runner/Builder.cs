@@ -137,7 +137,7 @@ namespace Marathon
         {
             var env = Runner.Configuration.GetSubKey("environment");
             foreach (var key in env.GetSubKeys().Select(x => x.Key))
-                env[key] = env.Get(key);
+                environment[key] = env.Get(key);
         }
 
         protected void Cleanup()
