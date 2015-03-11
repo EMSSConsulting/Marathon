@@ -33,7 +33,7 @@ namespace Marathon.Shells
 
         public abstract string FileExtension { get; }
 
-        public abstract string PrepareCommands(IEnumerable<string> commands);
+        public abstract string PrepareCommands(IEnumerable<string> commands, bool failFast = false);
 
         protected abstract ProcessStartInfo PrepareProcess(string commandFile);
 

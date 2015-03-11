@@ -22,13 +22,13 @@ namespace Marathon.Shells
 
             return startInfo;
         }
-
-        public override string PrepareCommands(IEnumerable<string> commands)
+        
+        public override string PrepareCommands(IEnumerable<string> commands, bool failFast)
         {
-            return commands.Select(x => x.Trim()).Where(x => x.Length > 0)
-                .Select(x => string.Format("Write {1}{0}{1}", Environment.NewLine, x.Replace("\"", "\"\"")))
-                //.Select(x => $"{x}{Environment.NewLine}if(-not $?) {{ Exit $LastExitCode }}")
-                .Aggregate((left, right) => string.Format("{1}{0}{2}{0}", Environment.NewLine, left, right));
+            commands = commands.Select(x => x.Trim()).Where(x => x.Length > 0)
+                .Select(x => string.Format("Write {1}{0}{1}", Environment.NewLine, x.Replace("\"", "\"\"")));
+            commands = commands.Select(x => string.Format("{1}{0}if (-not $?) {{ Exit $LastExitCode }}", Environment.NewLine, x));
+            return commands.Aggregate((left, right) => string.Format("{1}{0}{2}{0}", Environment.NewLine, left, right));
         }
     }
 }

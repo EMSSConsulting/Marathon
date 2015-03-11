@@ -3,6 +3,7 @@
 	"token": "",
 	"builds_path": "C:\\Builds\\",
 	"shell": "powershell",
+	"fail_fast": false,
 	"environment": {
 		"deploy_path": "C:\\Deployment"
 	},
