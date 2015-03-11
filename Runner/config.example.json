@@ -3,5 +3,10 @@
 	"token": "",
 	"builds_path": "C:\\Builds\\",
 	"shell": "powershell",
-	"setup": "git config http.sslVerify false"
+	"environment": {
+		"deploy_path": "C:\\Deployment"
+	},
+	"setup": {
+		"git ssl verification": "git config http.sslVerify false"
+	}
 }

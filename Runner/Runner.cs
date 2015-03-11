@@ -27,58 +27,49 @@ namespace Marathon
 
         private static Logger Log = LogManager.GetCurrentClassLogger();
 
-        public IConfiguration Configuration { get; private set; }
+        public IConfiguration Configuration { get; protected set; }
 
-        public RestClient Client { get; private set; }
+        public RestClient Client { get; protected set; }
 
         public bool Running { get; protected set; }
 
         #region Helper Classes
 
-        public Network Network { get; private set; }
+        public Network Network { get; protected set; }
 
-        public Shells.ShellBase Shell { get; private set; }
+        public Shells.ShellBase Shell { get; protected set; }
 
         #endregion
 
         public async Task Run()
         {
+            Log.Debug("Checking configuration");
+            if(!CheckConfiguration())
+            {
+                Log.Warn("GitLab CI Runner has not been configured correctly");
+                return;
+            }
+
             Log.Info("GitLab CI Runner started");
             while (Running)
             {
-                await Task.Delay(5000);
 
-                var buildInfo = await Network.RequestBuild();
-                if (buildInfo == null) continue;
+                var build = await FetchBuild();
+                if (build == null)
+                {
+                    await Task.Delay(5000);
+                    continue;
+                }
 
-                Log.Info("Starting build #{0} for {1}", buildInfo.ID, buildInfo.ProjectName);
-                Log.Debug("{0}...{1}", buildInfo.BeforeSHA, buildInfo.SHA);
-
-                var build = new Build(this, buildInfo);
+                await OnBuildStarting(build);
 
                 var result = await build.PerformBuild();
 
-                if (result.Success)
-                    Log.Info("Build #{0} completed", buildInfo.ID);
-                else
-                    Log.Warn("Build #{0} failed", buildInfo.ID);
 #pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
                 Task.Run(async () =>
 #pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 {
-                    var updateResponse = NetworkResponse.Failure;
-                    while (updateResponse == NetworkResponse.Failure)
-                    {
-                        Log.Trace("Updating server build status for build #{0}", buildInfo.ID);
-                        if (result.Success) updateResponse = await Network.UpdateBuild(buildInfo, BuildState.success, result.Output);
-                        else updateResponse = await Network.UpdateBuild(buildInfo, BuildState.failed, result.Output);
-
-                        if(updateResponse == NetworkResponse.Failure)
-                            await Task.Delay(5000);
-                    }
-
-                    Log.Trace("Server updated for build #{0}", buildInfo.ID);
+                    await OnBuildCompleted(build, result);
                 });
             }
         }
@@ -125,7 +116,7 @@ namespace Marathon
             }
         }
 
-        protected void Initialize()
+        protected virtual void Initialize()
         {
             Log.Debug("Using shell environment: {0}", Configuration.Get("shell") ?? "cmd");
             Shell = Shells.ShellBase.GetShell(Configuration.Get("shell") ?? "cmd");
@@ -139,6 +130,61 @@ namespace Marathon
 
                 Running = true;
             }
+        }
+
+        protected virtual bool CheckConfiguration()
+        {
+            var requiredProperties = new[] { "url", "token" };
+
+            bool validConfig = true;
+            foreach(var requiredProperty in requiredProperties)
+            {
+                Log.Debug("Checking configuration for {0}.", requiredProperty);
+                if(string.IsNullOrEmpty(Configuration.Get(requiredProperty)))
+                {
+                    validConfig = false;
+                    Log.Warn("Configuration was missing a value for {0}.", requiredProperty);
+                }
+            }
+
+            return validConfig;
+        }
+
+        protected virtual async Task<Build> FetchBuild()
+        {
+            var buildInfo = await Network.RequestBuild();
+            if (buildInfo == null) return null;
+
+            return new Build(this, buildInfo);
+        }
+
+        protected virtual async Task OnBuildStarting(Build build)
+        {
+            Log.Info("Starting build #{0} for {1}", build.BuildInfo.ID, build.BuildInfo.ProjectName);
+            Log.Debug("{0}...{1}", build.BuildInfo.BeforeSHA, build.BuildInfo.SHA);
+
+            await Task.Yield();
+        }
+
+        protected virtual async Task OnBuildCompleted(Build build, Models.BuildResult result)
+        {
+            if (result.Success)
+                Log.Info("Build #{0} completed", build.BuildInfo.ID);
+            else
+                Log.Warn("Build #{0} failed", build.BuildInfo.ID);
+
+            var updateResponse = NetworkResponse.Failure;
+            while (updateResponse == NetworkResponse.Failure)
+            {
+                Log.Trace("Updating server build status for build #{0}", build.BuildInfo.ID);
+                if (result.Success) updateResponse = await Network.UpdateBuild(build.BuildInfo, BuildState.success, result.Output);
+                else updateResponse = await Network.UpdateBuild(build.BuildInfo, BuildState.failed, result.Output);
+
+                if (updateResponse == NetworkResponse.Failure)
+                    await Task.Delay(5000);
+            }
+
+            Log.Trace("Server updated for build #{0}", build.BuildInfo.ID);
         }
     }
 }

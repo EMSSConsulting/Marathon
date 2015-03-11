@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NLog;
+using System.Diagnostics;
+using System.Collections.Specialized;
 
 namespace Marathon
 {
@@ -119,10 +121,21 @@ namespace Marathon
             commands.Add("git reset --hard");
             commands.Add("git checkout " + BuildInfo.SHA);
 
+            var setup = Runner.Configuration.GetSubKey("setup");
+            foreach (var key in setup.GetSubKeys().Select(x => x.Key))
+                commands.Add(setup.Get(key));
+
             commands.AddRange(BuildInfo.Commands.Split('\n').Select(x => x.Trim()));
 
             using (var commandFile = new StreamWriter(CommandFile))
                 await commandFile.WriteAsync(Runner.Shell.PrepareCommands(commands));
+        }
+
+        protected void SetupEnvironment(StringDictionary environment)
+        {
+            var env = Runner.Configuration.GetSubKey("environment");
+            foreach (var key in env.GetSubKeys().Select(x => x.Key))
+                env[key] = env.Get(key);
         }
 
         protected void Cleanup()
