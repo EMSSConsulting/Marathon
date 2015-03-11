@@ -18,3 +18,5 @@ components
 /Build
 /TestResults
 config.json
+*.tv2~
+*.TMP
