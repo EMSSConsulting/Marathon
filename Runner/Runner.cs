@@ -116,6 +116,14 @@ namespace Marathon
             }
         }
 
+        public async Task Clean()
+        {
+            Directory.Delete(Path.GetFullPath(Configuration.Get("build_path") ?? Path.Combine("tmp", "builds")), true);
+            Directory.Delete(Path.GetFullPath(Path.Combine("tmp", "scripts")), true);
+
+            await Task.Yield();
+        }
+
         protected virtual void Initialize()
         {
             Log.Debug("Using shell environment: {0}", Configuration.Get("shell") ?? "cmd");

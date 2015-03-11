@@ -28,6 +28,10 @@ namespace Marathon
                     runner.Setup().Wait();
                     return;
 
+                case "clean":
+                    runner.Clean().Wait();
+                    return;
+
                 case "start":
                     runner.Run().Wait();
                     return;
