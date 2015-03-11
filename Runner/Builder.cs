@@ -57,6 +57,8 @@ namespace Marathon
 
             Log.Debug("Preparing process for build #{0}", BuildInfo.ID);
             var process = Runner.Shell.PrepareBuild(CommandFile, ProjectDirectory, BuildInfo);
+            SetupEnvironment(process.StartInfo.EnvironmentVariables);
+
             Log.Trace("Running build #{0} process", BuildInfo.ID);
             var output = Runner.Shell.StartProcess(process);
 #pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
