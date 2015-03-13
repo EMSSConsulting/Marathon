@@ -148,6 +148,7 @@ namespace Marathon
 
         protected void CleanDirectory(string directory)
         {
+            Log.Trace("Cleaning directory {0}", directory);
             foreach (var subDir in LongPathDirectory.EnumerateDirectories(directory))
             {
                 CleanDirectory(subDir);

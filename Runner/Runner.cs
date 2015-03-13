@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NLog.Config;
 
 namespace Marathon
 {
@@ -43,6 +44,7 @@ namespace Marathon
 
         public async Task Run()
         {
+            var memoryLog = LogManager.Configuration.FindTargetByName("memory") as NLog.Targets.MemoryTarget;
             Log.Debug("Checking configuration");
             if (!CheckConfiguration())
             {
@@ -53,7 +55,7 @@ namespace Marathon
             Log.Info("GitLab CI Runner started");
             while (Running)
             {
-
+                if(memoryLog != null) memoryLog.Logs.Clear();
                 var build = await FetchBuild();
                 if (build == null)
                 {
@@ -72,22 +74,11 @@ namespace Marathon
                 catch (Exception ex)
                 {
                     Log.FatalException("Failed to perform build", ex);
-
-                    var errorSource = "";
-                    while(ex != null)
-                    {
-                        errorSource += "\r\n\r\n";
-                        errorSource += ex.Message;
-                        errorSource += "\r\n";
-                        errorSource += "Stack Trace:\r\n";
-                        errorSource += ex.StackTrace;
-                        ex = ex.InnerException;
-                    }
-
+                    
                     result = new Models.BuildResult()
                     {
                         Success = false,
-                        Output = errorSource.Trim()
+                        Output = memoryLog != null ? memoryLog.Logs.Aggregate((left, right) => left + "\n" + right) : ex.ToString()
                     };
                 }
 #pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
