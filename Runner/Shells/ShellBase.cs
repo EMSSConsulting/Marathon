@@ -56,6 +56,7 @@ namespace Marathon.Shells
 
             process.StartInfo.EnvironmentVariables["CI_BUILD_REF"] = buildInfo.Ref;
             process.StartInfo.EnvironmentVariables["CI_BUILD_REF_NAME"] = buildInfo.Ref;
+            process.StartInfo.EnvironmentVariables["CI_BUILD_REF_PREVIOUS"] = buildInfo.BeforeSHA;
             process.StartInfo.EnvironmentVariables["CI_BUILD_ID"] = buildInfo.ID.ToString();
 
             process.StartInfo.RedirectStandardOutput = true;
