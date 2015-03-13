@@ -27,7 +27,10 @@ namespace Marathon.Shells
         {
             commands = commands.Select(x => x.Trim()).Where(x => x.Length > 0)
                 .Select(x => string.Format("echo {2}{0}{1}", Environment.NewLine, x, x.Replace("%", "%%")));
-            commands = commands.Select(x => string.Format("{1}{0}if errorlevel 1 (exit /b %errorlevel%)", Environment.NewLine, x));
+
+            if(failFast)
+                commands = commands.Select(x => string.Format("{1} || exit /b 1{0}", Environment.NewLine, x, x.Replace("%", "%%")));
+
             return commands.Aggregate((left, right) => string.Format("{1}{0}{2}{0}", Environment.NewLine, left, right));
         }
     }

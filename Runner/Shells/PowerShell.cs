@@ -27,7 +27,10 @@ namespace Marathon.Shells
         {
             commands = commands.Select(x => x.Trim()).Where(x => x.Length > 0)
                 .Select(x => string.Format("Write {2}{0}{1}", Environment.NewLine, x, x.Replace("\"", "\"\"")));
-            commands = commands.Select(x => string.Format("{1}{0}if (-not $?) {{ Exit $LastExitCode }}", Environment.NewLine, x));
+
+            if(failFast)
+                commands = commands.Select(x => string.Format("{1}{0}if (-not $?) {{ Exit $LastExitCode }}", Environment.NewLine, x));
+
             return commands.Aggregate((left, right) => string.Format("{1}{0}{2}{0}", Environment.NewLine, left, right));
         }
     }
