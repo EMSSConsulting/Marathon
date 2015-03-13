@@ -152,10 +152,26 @@ namespace Marathon
             foreach (var subDir in LongPathDirectory.EnumerateDirectories(directory))
             {
                 CleanDirectory(subDir);
-                LongPathDirectory.Delete(subDir);
+                try
+                {
+                    Directory.Delete(subDir);
+                }
+                catch (PathTooLongException)
+                {
+                    LongPathDirectory.Delete(subDir);
+                }
             }
             foreach (var file in LongPathDirectory.EnumerateFiles(directory))
-                LongPathFile.Delete(file);
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (PathTooLongException)
+                {
+                    LongPathFile.Delete(file);
+                }
+            }
         }
     }
 
