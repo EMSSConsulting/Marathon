@@ -13,6 +13,23 @@ through the process of configuring Marathon to connect to your GitLab CI instanc
 Marathon can be started by using `marathon start` from the command line - this will begin polling your
 configured GitLab CI server for builds and executing any that are returned to the current Marathon instance.
 
+## Build Environment
+To assist with automating build processes, a number of environment variables are set by Marathon to indicate
+properties of the build taking place. You'd generally use them within build/deployment scripts to specify
+output directories or file transforms - for example, setting your assembly version.
+
+- **CI_SERVER** is set to `yes` to indicate that your build is running on a CI server.
+- **CI\_SERVER\_NAME** is set to `GitLab CI` to indicate the type of CI server running your build.
+- **CI\_SERVER\_VERSION** is currently not specified.
+- **CI\_SERVER\_REVISION** is currently not specified.
+- **CI\_BUILD\_REF** is set to the full SHA hash of the commit for which you are conducting a build.
+- **CI\_BUILD\_REF\_NAME** is set to the branch or tag name for which the build is being conducted.
+- **CI\_BUILD\_REF\_PREVIOUS** is set to the full SHA hash of the commit preceding this build.
+- **CI\_BUILD\_ID** is set to the unique build ID used internally by GitLab CI to identify the build.
+
+In addition to this, the working directory of your build script is set to the build path - which matches
+the root of your repository.
+
 ## Configuration
 The `config.json` file used by Marathon can be easily edited if you wish to change any of the configuration
 options later. In addition to this, you can specify the shell you want to use (**cmd** by default) and the
