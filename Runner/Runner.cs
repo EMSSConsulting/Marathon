@@ -44,7 +44,7 @@ namespace Marathon
         public async Task Run()
         {
             Log.Debug("Checking configuration");
-            if(!CheckConfiguration())
+            if (!CheckConfiguration())
             {
                 Log.Warn("GitLab CI Runner has not been configured correctly");
                 return;
@@ -63,8 +63,33 @@ namespace Marathon
 
                 await OnBuildStarting(build);
 
-                var result = await build.PerformBuild();
+                Models.BuildResult result;
 
+                try
+                {
+                    result = await build.PerformBuild();
+                }
+                catch (Exception ex)
+                {
+                    Log.FatalException("Failed to perform build", ex);
+
+                    var errorSource = "";
+                    while(ex != null)
+                    {
+                        errorSource += "\r\n\r\n";
+                        errorSource += ex.Message;
+                        errorSource += "\r\n";
+                        errorSource += "Stack Trace:\r\n";
+                        errorSource += ex.StackTrace;
+                        ex = ex.InnerException;
+                    }
+
+                    result = new Models.BuildResult()
+                    {
+                        Success = false,
+                        Output = errorSource.Trim()
+                    };
+                }
 #pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 Task.Run(async () =>
 #pragma warning restore 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -145,10 +170,10 @@ namespace Marathon
             var requiredProperties = new[] { "url", "token" };
 
             bool validConfig = true;
-            foreach(var requiredProperty in requiredProperties)
+            foreach (var requiredProperty in requiredProperties)
             {
                 Log.Debug("Checking configuration for {0}.", requiredProperty);
-                if(string.IsNullOrEmpty(Configuration.Get(requiredProperty)))
+                if (string.IsNullOrEmpty(Configuration.Get(requiredProperty)))
                 {
                     validConfig = false;
                     Log.Warn("Configuration was missing a value for {0}.", requiredProperty);
