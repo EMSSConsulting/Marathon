@@ -165,6 +165,7 @@ namespace Marathon
             {
                 try
                 {
+                    File.SetAttributes(file, FileAttributes.Normal);
                     File.Delete(file);
                 }
                 catch (PathTooLongException)
