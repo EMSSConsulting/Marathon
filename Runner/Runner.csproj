@@ -50,6 +50,10 @@
     <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Experimental.IO, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Experimental.IO.1.0.0.0\lib\NETFramework40\Microsoft.Experimental.IO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Framework.ConfigurationModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Framework.ConfigurationModel.1.0.0-beta3\lib\net45\Microsoft.Framework.ConfigurationModel.dll</HintPath>
       <Private>True</Private>

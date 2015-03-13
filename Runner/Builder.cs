@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using NLog;
 using System.Diagnostics;
 using System.Collections.Specialized;
+using Microsoft.Experimental.IO;
 
 namespace Marathon
 {
@@ -92,14 +93,14 @@ namespace Marathon
 
         protected void PrepareDirectory()
         {
-            if (Directory.Exists(ProjectDirectory) && !BuildInfo.AllowGitFetch)
-                Directory.Delete(ProjectDirectory, true);
+            if (LongPathDirectory.Exists(ProjectDirectory) && !BuildInfo.AllowGitFetch)
+                CleanDirectory(ProjectDirectory);
 
-            if (!Directory.Exists(ProjectDirectory))
-                Directory.CreateDirectory(ProjectDirectory);
+            if (!LongPathDirectory.Exists(ProjectDirectory))
+                LongPathDirectory.Create(ProjectDirectory);
 
-            if (!Directory.Exists(Path.GetDirectoryName(CommandFile)))
-                Directory.CreateDirectory(Path.GetDirectoryName(CommandFile));
+            if (!LongPathDirectory.Exists(Path.GetDirectoryName(CommandFile)))
+                LongPathDirectory.Create(Path.GetDirectoryName(CommandFile));
         }
 
         protected async Task BuildCommandFile()
@@ -143,6 +144,17 @@ namespace Marathon
         protected void Cleanup()
         {
             if (File.Exists(CommandFile)) File.Delete(CommandFile);
+        }
+
+        protected void CleanDirectory(string directory)
+        {
+            foreach (var subDir in LongPathDirectory.EnumerateDirectories(directory))
+            {
+                CleanDirectory(subDir);
+                LongPathDirectory.Delete(subDir);
+            }
+            foreach (var file in LongPathDirectory.EnumerateFiles(directory))
+                LongPathFile.Delete(file);
         }
     }
 
