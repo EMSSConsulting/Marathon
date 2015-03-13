@@ -78,7 +78,7 @@ namespace Marathon
                     result = new Models.BuildResult()
                     {
                         Success = false,
-                        Output = memoryLog != null ? memoryLog.Logs.Aggregate((left, right) => left + "\n" + right) : ex.ToString()
+                        Output = "GitLab CI Runner Failure:\r\n\r\n" + (memoryLog != null ? memoryLog.Logs.Aggregate((left, right) => left + "\r\n" + right) : ex.ToString())
                     };
                 }
 #pragma warning disable 4014 // Because this call is not awaited, execution of the current method continues before the call is completed
