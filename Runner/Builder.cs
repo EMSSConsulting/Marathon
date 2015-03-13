@@ -131,7 +131,10 @@ namespace Marathon
             commands.AddRange(BuildInfo.Commands.Split('\n').Select(x => x.Trim()));
 
             using (var commandFile = new StreamWriter(CommandFile))
-                await commandFile.WriteAsync(Runner.Shell.PrepareCommands(commands, (Runner.Configuration.Get("fail_fast") ?? "false") == "true"));
+            {
+                var fail_fast = (Runner.Configuration.Get("fail_fast") ?? "false").Equals("true", StringComparison.InvariantCultureIgnoreCase);
+                await commandFile.WriteAsync(Runner.Shell.PrepareCommands(commands, fail_fast));
+            }
         }
 
         protected void SetupEnvironment(StringDictionary environment)
