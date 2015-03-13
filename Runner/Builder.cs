@@ -122,7 +122,7 @@ namespace Marathon
 
             commands.Add(string.Format("cd \"{0}\"", ProjectDirectory));
             commands.Add("git reset --hard");
-            commands.Add("git checkout " + BuildInfo.SHA);
+            commands.Add("git checkout -B " + BuildInfo.Ref + " " + BuildInfo.SHA);
 
             var setup = Runner.Configuration.GetSubKey("setup");
             foreach (var key in setup.GetSubKeys().Select(x => x.Key))
