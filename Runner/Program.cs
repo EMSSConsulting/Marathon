@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using NLog;
 
 namespace Marathon
 {
     class Program
     {
+        private static Logger Log = LogManager.GetCurrentClassLogger();
+
         static void Main(string[] args)
         {
             if (args.Length == 0) { ShowHelp(); return; }
@@ -12,6 +16,7 @@ namespace Marathon
             Console.Title = "GitLab CI Runner";
 
             var runner = new Runner(args.Skip(1).ToArray());
+            Task waitFor = null;
             switch (args[0])
             {
                 case "help":
@@ -25,17 +30,25 @@ namespace Marathon
                     return;
 
                 case "setup":
-                    runner.Setup().Wait();
-                    return;
+                    waitFor = runner.Setup();
+                    break;
 
                 case "clean":
-                    runner.Clean().Wait();
-                    return;
+                    waitFor = runner.Clean();
+                    break;
 
                 case "start":
-                    runner.Run().Wait();
-                    return;
+                    waitFor = runner.Run();
+                    break;
             }
+
+            Console.CancelKeyPress += (o, e) =>
+            {
+                Log.Info("Close signal received - shutting down when the current build compltes.");
+                runner.Running = false;
+            };
+
+            if (waitFor != null) waitFor.Wait();
         }
 
         static void ShowHelp()

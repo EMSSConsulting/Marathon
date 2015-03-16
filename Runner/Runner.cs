@@ -32,7 +32,7 @@ namespace Marathon
 
         public RestClient Client { get; protected set; }
 
-        public bool Running { get; protected set; }
+        public bool Running { get; set; }
 
         #region Helper Classes
 
