@@ -18,15 +18,17 @@ namespace Marathon.Shells
 
         protected override ProcessStartInfo PrepareProcess(string commandFile)
         {
-            var startInfo = new ProcessStartInfo("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -Command \"" + commandFile + "\"");
+            var startInfo = new ProcessStartInfo("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -File \"" + commandFile + "\"");
 
             return startInfo;
         }
         
         public override string PrepareCommands(IEnumerable<string> commands, bool failFast)
         {
-            commands = commands.Select(x => x.Trim()).Where(x => x.Length > 0)
-                .Select(x => string.Format("Write {2}{0}{1}", Environment.NewLine, x, x.Replace("\"", "\"\"")));
+            commands = commands.Select(x => x.Trim()).Where(x => x.Length > 0);
+
+            // Echo commands to output
+            commands = commands.Select(x => string.Format("Write \"{2}\"{0}{1}", Environment.NewLine, x, x.Replace("\"", "`\"").Replace("$", "`$")));
 
             if(failFast)
                 commands = commands.Select(x => string.Format("{1}{0}if (-not $?) {{ Exit $LastExitCode }}", Environment.NewLine, x));
