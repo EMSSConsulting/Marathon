@@ -64,6 +64,8 @@ and Marathon will attempt to guess logical values for them if you don't specify 
    Marathon defaults to `cmd` but you can also use `powershell`.
  - **fail_fast** can be used to include exit status checks in the generated shell script after
    each command - allowing you to exit the build process immediately if any error is encountered.
+ - **keep_scripts** lets you instruct Marathon to keep the build scripts it generates so that you
+   can more easily debug problems in your build process.
  - **environment** can be used to specify environment variables which will be available within
    your build script. It's useful if you want each runner to behave slightly differently.
  - **setup** lets you specify commands to be run before your build script. It's generally used
