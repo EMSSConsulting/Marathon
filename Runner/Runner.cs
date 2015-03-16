@@ -18,7 +18,7 @@ namespace Marathon
             Configuration = new Configuration()
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
-                .Add(new Helpers.WritableJsonConfigurationSource("config.json"));
+                .Add(new Helpers.WritableJsonConfigurationSource(Path.Combine(Environment.CurrentDirectory, "config.json")));
 
             Shells.ShellBase.Register(new Shells.PowerShell(), new Shells.CommandPrompt());
 
