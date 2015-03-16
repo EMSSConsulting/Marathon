@@ -1,0 +1,16 @@
+﻿{
+	"url": "https://ci.gitlab.org",
+	"token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+	"builds_path": "C:\\CI\\Builds",
+	"shell": "powershell",
+	"fail_fast": true,
+	"environment": {
+		"NUGET_PACKAGES": "C:\\NuGet\\packages",
+		"WEB_DEPLOYMENTS": "E:\\Deployments",
+		"ARTIFACTS": "C:\\CI\\Artifacts"
+	},
+	"setup": {
+		"visual studio environment": "Invoke-BatchFile \"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\VC\\vcvarsall.bat\" amd64",
+		"git version": "(gitversion /output json | Out-String | ConvertFrom-Json).psobject.properties | foreach { [environment]::SetEnvironmentVariable(\"GitVersion\" + $_.name,$_.value) }"
+	}
+}
