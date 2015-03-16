@@ -146,7 +146,9 @@ namespace Marathon
 
         protected void Cleanup()
         {
-            if (File.Exists(CommandFile)) File.Delete(CommandFile);
+            var keep_scripts = (Runner.Configuration.Get("keep_scripts") ?? "false").Equals("true", StringComparison.InvariantCultureIgnoreCase);
+            if (File.Exists(CommandFile) && !keep_scripts)
+                File.Delete(CommandFile);
         }
 
         protected void CleanDirectory(string directory)

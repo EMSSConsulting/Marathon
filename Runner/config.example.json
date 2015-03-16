@@ -4,6 +4,7 @@
 	"builds_path": "C:\\Builds\\",
 	"shell": "powershell",
 	"fail_fast": false,
+	"keep_scripts": false,
 	"environment": {
 		"deploy_path": "C:\\Deployment"
 	},
