@@ -78,3 +78,24 @@ and Marathon will attempt to guess logical values for them if you don't specify 
 Chances are you don't want to manually start Marathon every time you boot up your computer - the best
 way to avoid this is by installing it as a Windows Service. We recommend using [NSSM](http://nssm.cc/)
 to do so as it works exceptionally well out of the box.
+
+Simply run `nssm install GitLabCIRunner Marathon.exe` to install the service.
+
+## Dependencies
+Marathon requires that `git` be available in your path for the user under which it runs. The quickest
+way to achieve this is to install [msysgit](https://msysgit.github.io/), making sure to enable `git` for
+the Windows command prompt.
+
+You can then check to make sure it is working by opening a command prompt using `Win+X I` and typing
+`git` into it.
+
+## Long File Paths
+Marathon includes support for long paths on Windows (>256 characters long) however Git by default isn't
+configured to support them. If you're noticing builds failing during the clean phase (only if you've
+got GitLab CI configured to use `git fetch` for the project) then chances are that's the cause.
+
+To solve this problem, simply run the following from an administrative command prompt.
+
+```sh
+git config --system core.longpaths true
+```
